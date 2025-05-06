@@ -1,0 +1,26 @@
+<!-- clients.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+</head>
+<body>
+    <h1>Clientes</h1>
+    <div id="clientsList"></div>
+    <script src="js/api.js"></script>
+    <script>
+        // Obtener los clientes de la API
+        (async () => {
+            const clients = await fetchData('https://example.com/api/clients');
+            const clientsList = document.getElementById('clientsList');
+            clients.forEach(client => {
+                const clientItem = document.createElement('div');
+                clientItem.textContent = `${client.name} - ${client.email}`;
+                clientsList.appendChild(clientItem);
+            });
+        })();
+    </script>
+</body>
+</html>
