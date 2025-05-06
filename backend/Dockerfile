@@ -1,6 +1,14 @@
 # Usar una imagen oficial de Python como base
 FROM python:3.10-slim
 
+# Instalar las dependencias del sistema necesarias para mysqlclient
+RUN apt-get update && \
+    apt-get install -y \
+    pkg-config \
+    libmariadb-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 # Establecer el directorio de trabajo en el contenedor
 WORKDIR /app
 
