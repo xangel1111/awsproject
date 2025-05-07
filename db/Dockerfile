@@ -10,4 +10,4 @@ COPY init.sql /docker-entrypoint-initdb.d/
 EXPOSE 3306
 
 # Establecer la variable de entorno para la IP
-ENV MYSQL_ALLOW_REMOTE_HOST=your_allowed_host_or_ip
+ENV MYSQL_ALLOW_REMOTE_HOST=ec2-18-224-32-188.us-east-2.compute.amazonaws.com
