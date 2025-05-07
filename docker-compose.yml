@@ -5,6 +5,8 @@ services:
     build:
       context: ./db
     container_name: db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - "3306:3306"
 
@@ -12,6 +14,8 @@ services:
     build:
       context: ./backend
     container_name: backend
+    environment:
+      DB_HOST: "ec2-18-224-32-188.us-east-2.compute.amazonaws.com"
     ports:
       - "8000:8000"
     depends_on:
