@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': 'shop',
         'USER': 'root',
         'PASSWORD': '',
-        'HOST': 'ec2-18-188-97-25.us-east-2.compute.amazonaws.com',
+        'HOST': 'ec2-18-224-32-188.us-east-2.compute.amazonaws.com',
         'PORT': '3306',
     }
 }
