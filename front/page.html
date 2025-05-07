@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #1e1e1e;
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00aaff;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: #333;
+        }
+        
+        .page {
+            display: none;
+            padding: 20px;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        form {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            max-width: 400px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #00aaff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0088cc;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        
+        th {
+            background-color: #1e1e1e;
+        }
+        
+        .error {
+            color: #ff5555;
+            margin: 10px 0;
+        }
+        
+        .logout-btn {
+            background-color: #ff5555;
+        }
+        
+        .logout-btn:hover {
+            background-color: #cc4444;
+        }
+        
+        #user-info {
+            margin-right: 15px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">API Client</div>
+            <div class="auth-section">
+                <span id="user-info"></span>
+                <button id="logout-btn" class="logout-btn" style="display: none;">Cerrar sesión</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Página de login -->
+        <div id="login-page" class="page active">
+            <h2>Iniciar sesión</h2>
+            <form id="login-form">
+                <div>
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div>
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="error" id="login-error"></div>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+        </div>
+
+        <!-- Página de clientes -->
+        <div id="clients-page" class="page">
+            <div class="nav-links">
+                <a href="#" id="go-to-clients" class="active">Clientes</a>
+                <a href="#" id="go-to-products">Productos</a>
+            </div>
+            <h2>Lista de Clientes</h2>
+            <div class="error" id="clients-error"></div>
+            <table id="clients-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Página de productos -->
+        <div id="products-page" class="page">
+            <div class="nav-links">
+                <a href="#" id="go-to-clients-from-products">Clientes</a>
+                <a href="#" id="go-to-products-from-products" class="active">Productos</a>
+            </div>
+            <h2>Lista de Productos</h2>
+            <div class="error" id="products-error"></div>
+            <table id="products-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de la API
+        const API_CONFIG = {
+            baseUrl: 'http://ec2-18-224-32-188.us-east-2.compute.amazonaws.com:8000/api', // Debes colocar la URL base de tu API aquí
+            endpoints: {
+                login: '/token/', // Ajusta según tu API
+                clients: '/clientes/',  // Ajusta según tu API
+                products: '/productos/' // Ajusta según tu API
+            }
+        };
+
+        // Elementos DOM
+        const pages = {
+            login: document.getElementById('login-page'),
+            clients: document.getElementById('clients-page'),
+            products: document.getElementById('products-page')
+        };
+
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const userInfo = document.getElementById('user-info');
+        const logoutBtn = document.getElementById('logout-btn');
+        const clientsTable = document.getElementById('clients-table').querySelector('tbody');
+        const productsTable = document.getElementById('products-table').querySelector('tbody');
+        const clientsError = document.getElementById('clients-error');
+        const productsError = document.getElementById('products-error');
+
+        // Navegación
+        document.getElementById('go-to-clients').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('clients');
+        });
+
+        document.getElementById('go-to-products').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('products');
+        });
+
+        document.getElementById('go-to-clients-from-products').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('clients');
+        });
+
+        document.getElementById('go-to-products-from-products').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('products');
+        });
+
+        // Gestión de token y sesión
+        function getToken() {
+            return localStorage.getItem('auth_token');
+        }
+
+        function setToken(token) {
+            localStorage.setItem('auth_token', token);
+        }
+
+        function clearToken() {
+            localStorage.removeItem('auth_token');
+        }
+
+        function getUserInfo() {
+            return localStorage.getItem('user_info');
+        }
+
+        function setUserInfo(info) {
+            localStorage.setItem('user_info', info);
+        }
+
+        function clearUserInfo() {
+            localStorage.removeItem('user_info');
+        }
+
+        // Mostrar página específica
+        function showPage(pageId) {
+            Object.values(pages).forEach(page => {
+                page.classList.remove('active');
+            });
+            pages[pageId].classList.add('active');
+
+            // Si cambiamos a una página protegida, cargamos los datos
+            if (pageId === 'clients') {
+                loadClients();
+            } else if (pageId === 'products') {
+                loadProducts();
+            }
+        }
+
+        // Verificar autenticación
+        function checkAuth() {
+            const token = getToken();
+            if (token) {
+                // Usuario autenticado
+                logoutBtn.style.display = 'inline-block';
+                const userInfoText = getUserInfo();
+                if (userInfoText) {
+                    userInfo.textContent = `Hola, ${userInfoText}`;
+                }
+                return true;
+            } else {
+                // Usuario no autenticado
+                showPage('login');
+                logoutBtn.style.display = 'none';
+                userInfo.textContent = '';
+                return false;
+            }
+        }
+
+        // Realizar llamadas a la API
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const url = API_CONFIG.baseUrl + endpoint;
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Agregar token Bearer si existe
+            const token = getToken();
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            const options = {
+                method,
+                headers
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                
+                // Si la respuesta no es exitosa
+                if (!response.ok) {
+                    // Si es un error de autorización, cerrar sesión
+                    if (response.status === 401) {
+                        clearToken();
+                        clearUserInfo();
+                        checkAuth();
+                        throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+                    }
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Función de login
+        async function login(username, password) {
+            try {
+                const data = await apiCall(API_CONFIG.endpoints.login, 'POST', { username, password });
+
+                console.log(data);
+                
+                if (data && data.access) {
+                    setToken(data.access);
+                    setUserInfo(username);
+                    showPage('clients');
+                    checkAuth();
+                    return true;
+                } else {
+                    throw new Error('Formato de respuesta inválido');
+                }
+            } catch (error) {
+                loginError.textContent = error.message || 'Error al iniciar sesión';
+                return false;
+            }
+        }
+
+        // Cargar clientes
+        async function loadClients() {
+            try {
+                clientsTable.innerHTML = '';
+                clientsError.textContent = '';
+                
+                const clients = await apiCall(API_CONFIG.endpoints.clients);
+                
+                if (Array.isArray(clients)) {
+                    clients.forEach(client => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${client.id || '-'}</td>
+                            <td>${client.name || client.nombre || '-'}</td>
+                            <td>${client.email || client.correo || '-'}</td>
+                            <td>${client.phone || client.telefono || '-'}</td>
+                        `;
+                        clientsTable.appendChild(row);
+                    });
+                } else {
+                    throw new Error('Formato de datos inválido');
+                }
+            } catch (error) {
+                clientsError.textContent = error.message || 'Error al cargar clientes';
+            }
+        }
+
+        // Cargar productos
+        async function loadProducts() {
+            try {
+                productsTable.innerHTML = '';
+                productsError.textContent = '';
+                
+                const products = await apiCall(API_CONFIG.endpoints.products);
+                
+                if (Array.isArray(products)) {
+                    products.forEach(product => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${product.id || '-'}</td>
+                            <td>${product.name || product.nombre || '-'}</td>
+                            <td>${product.description || product.descripcion || '-'}</td>
+                            <td>${product.price || product.precio || '-'}</td>
+                            <td>${product.stock || '-'}</td>
+                        `;
+                        productsTable.appendChild(row);
+                    });
+                } else {
+                    throw new Error('Formato de datos inválido');
+                }
+            } catch (error) {
+                productsError.textContent = error.message || 'Error al cargar productos';
+            }
+        }
+
+        // Event listeners
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            await login(username, password);
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            clearToken();
+            clearUserInfo();
+            showPage('login');
+            checkAuth();
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuth()) {
+                showPage('clients');
+            } else {
+                showPage('login');
+            }
+        });
+    </script>
+</body>
+</html>
