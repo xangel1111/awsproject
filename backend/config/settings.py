@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -101,7 +102,7 @@ DATABASES = {
         'NAME': 'shop',
         'USER': 'root',
         'PASSWORD': '',
-        'HOST': 'ec2-18-224-32-188.us-east-2.compute.amazonaws.com',
+        'HOST': config('DB_HOST'),
         'PORT': '3306',
     }
 }

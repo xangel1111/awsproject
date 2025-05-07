@@ -1,13 +1,13 @@
 FROM mysql:8.0
 
-# Copiar un archivo de configuración personalizado de MySQL (si es necesario)
-# Esto es opcional, si necesitas hacer alguna modificación al archivo de configuración
-# por ejemplo, permitir conexiones remotas
-
+# Copiar el archivo de configuración personalizado de MySQL
 COPY my.cnf /etc/mysql/my.cnf
 
-# Copiar un script de inicialización para configurar el acceso remoto
+# Copiar el script de inicialización
 COPY init.sql /docker-entrypoint-initdb.d/
 
-# Exponer el puerto 3306 para conexiones MySQL
+# Exponer el puerto 3306
 EXPOSE 3306
+
+# Establecer la variable de entorno para la IP
+ENV MYSQL_ALLOW_REMOTE_HOST=your_allowed_host_or_ip
