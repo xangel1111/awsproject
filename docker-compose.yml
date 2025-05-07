@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  db:
+    build:
+      context: ./db
+    container_name: db
+    ports:
+      - "3306:3306"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  front:
+    build:
+      context: ./front
+    container_name: frontend
+    ports:
+      - "4000:80"
+    depends_on:
+      - backend
