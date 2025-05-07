@@ -73,13 +73,14 @@
         }
         
         input {
-            width: 100%;
+            width: 100%; /* Mismo ancho que el botón */
             padding: 10px;
             margin: 10px 0;
             background-color: #333;
             border: 1px solid #444;
             color: white;
             border-radius: 4px;
+            box-sizing: border-box; /* Para que el padding no se sume al ancho */
         }
         
         button {
@@ -90,6 +91,8 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
+            width: 100%; /* Ancho completo para el botón */
+            box-sizing: border-box;
         }
         
         button:hover {
@@ -129,12 +132,16 @@
             margin-right: 15px;
             color: #aaa;
         }
+
+        .auth-section {
+            display: flex;
+        }
     </style>
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo">API Client</div>
+            <div class="logo">TIENDA</div>
             <div class="auth-section">
                 <span id="user-info"></span>
                 <button id="logout-btn" class="logout-btn" style="display: none;">Cerrar sesión</button>
@@ -145,19 +152,21 @@
     <div class="container">
         <!-- Página de login -->
         <div id="login-page" class="page active">
-            <h2>Iniciar sesión</h2>
-            <form id="login-form">
-                <div>
-                    <label for="username">Usuario</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div>
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" required>
-                </div>
-                <div class="error" id="login-error"></div>
-                <button type="submit">Iniciar sesión</button>
-            </form>
+            <div style="display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column;">
+                <h2>Iniciar sesión</h2>
+                <form id="login-form">
+                    <div>
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div>
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <div class="error" id="login-error"></div>
+                    <button type="submit">Iniciar sesión</button>
+                </form>
+            </div>
         </div>
 
         <!-- Página de clientes -->
@@ -207,11 +216,11 @@
     <script>
         // Configuración de la API
         const API_CONFIG = {
-            baseUrl: 'http://ec2-18-224-32-188.us-east-2.compute.amazonaws.com:8000/api', // Debes colocar la URL base de tu API aquí
+            baseUrl: 'http://ec2-18-224-32-188.us-east-2.compute.amazonaws.com:8000/api', // -- CAMBIAR
             endpoints: {
-                login: '/token/', // Ajusta según tu API
-                clients: '/clientes/',  // Ajusta según tu API
-                products: '/productos/' // Ajusta según tu API
+                login: '/token/',
+                clients: '/clientes/',
+                products: '/productos/'
             }
         };
 
@@ -345,7 +354,7 @@
                         clearToken();
                         clearUserInfo();
                         checkAuth();
-                        throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+                        throw new Error('usuario o contraseña incorrecta.');
                     }
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
