@@ -24,6 +24,8 @@ COPY . /app/
 # Exponer el puerto en el que Django estará ejecutándose
 EXPOSE 8000
 
+ENV DB_HOST=ec2-18-224-32-188.us-east-2.compute.amazonaws.com
+
 # Ejecutar makemigrations, migrate y luego iniciar el servidor
 CMD python manage.py makemigrations && \
     python manage.py migrate && \
