@@ -1,13 +1,11 @@
-CREATE USER IF NOT EXISTS 'root'@'%';
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '';
 
--- Establecer los privilegios
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'${MYSQL_ALLOW_REMOTE_HOST}' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 
--- Crear la base de datos 'shop'
+FLUSH PRIVILEGES;
+
 CREATE DATABASE IF NOT EXISTS shop;
 
--- Conceder privilegios sobre la base de datos 'shop'
-GRANT ALL PRIVILEGES ON shop.* TO 'root'@'${MYSQL_ALLOW_REMOTE_HOST}';
+GRANT ALL PRIVILEGES ON shop.* TO 'root'@'%';
 
--- Recargar los privilegios
 FLUSH PRIVILEGES;
